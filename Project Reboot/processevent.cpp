@@ -289,7 +289,8 @@ bool ServerReadyToStartMatch(UObject* PlayerController, UFunction* Function, voi
 		if (Fortnite_Version < 8.30)
 		{
 			static auto AbilitySet = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer"));
-			GiveFortAbilitySet(Pawn, AbilitySet);
+			// GiveFortAbilitySet(Pawn, AbilitySet);
+			GiveBasicGameplayAbilities(Pawn);
 		}
 		else
 		{
@@ -1180,7 +1181,21 @@ bool ClientOnPawnDied(UObject* DeadController, UFunction* fn, void* Parameters)
 	{
 		// if (Fortnite_Version > 11.30)
 		{
+			if (DeadPawn)
+				Helper::DestroyActor(DeadPawn);
+
 			auto RespawnedPawn = Helper::SpawnPawn(DeadController, DeathLocation);
+			
+			static auto ActivateSlot = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ActivateSlot");
+			struct {
+				EFortQuickBars InQuickBar;
+				int Slot;
+				float ActivateDelay;
+				bool bUpdatePreviousFocusedSlot;
+			} ActivateSlot_Params{EFortQuickBars::Primary, 0, 0, true};
+			DeadController->ProcessEvent(ActivateSlot, &ActivateSlot_Params);
+
+			GiveBasicGameplayAbilities(RespawnedPawn);
 
 			static auto TeleportToSkyDive = FindObject<UFunction>("/Script/FortniteGame.FortPlayerPawnAthena.TeleportToSkyDive");
 			float HeightAboveGround = 15000;

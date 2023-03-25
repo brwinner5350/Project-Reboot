@@ -187,7 +187,10 @@ void* Abilities::GrantGameplayAbility(UObject* TargetPawn, UObject* GameplayAbil
     auto AbilitySystemComponent = Helper::GetAbilitySystemComponent(TargetPawn);
 
     if (!AbilitySystemComponent)
+    {
+        std::cout << "GrantGameplayAbility: Pawn has no AbilitySystemComponent!\n";
         return nullptr;
+    }
 
     UObject* DefaultObject = nullptr;
 
@@ -234,12 +237,17 @@ void* Abilities::GrantGameplayAbility(UObject* TargetPawn, UObject* GameplayAbil
     void* NewSpec = GenerateNewSpec(DefaultObject, SourceObject);
 
     if (!NewSpec)
+    {
+        std::cout << "GrantGameplayAbility: Failed to generate new spec\n";
         return nullptr;
+    }
 
     auto Handle = (FGameplayAbilitySpecHandle*)(__int64(NewSpec) + HandleOffset);
 
     if (!NewSpec || DoesASCHaveAbility(AbilitySystemComponent, *GetAbilityFromSpec(NewSpec)).size())
+    {
         return nullptr;
+    }
 
     // https://github.com/EpicGames/UnrealEngine/blob/4.22/Engine/Plugins/Runtime/GameplayAbilities/Source/GameplayAbilities/Private/AbilitySystemComponent_Abilities.cpp#L232
 
@@ -415,6 +423,8 @@ void GiveFortAbilitySet(UObject* Pawn, UObject* FortAbilitySet)
         if (!Ability)
             continue;
 
+        std::cout << "Ability Name: " << Ability->GetName() << std::endl;
+
         Abilities::GrantGameplayAbility(Pawn, Ability);
     }
 
@@ -439,4 +449,25 @@ void GiveFortAbilitySet(UObject* Pawn, UObject* FortAbilitySet)
             Helper::ApplyGameplayEffect(Pawn, GameplayEffectToGrant, GameplayEffectInfo.Level);
         }
     }
+}
+
+void GiveBasicGameplayAbilities(UObject* Pawn)
+{
+    static auto GA_DefaultPlayer_InteractSearch = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_InteractSearch.GA_DefaultPlayer_InteractSearch_C"));
+    static auto GA_DefaultPlayer_InteractUse = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_InteractUse.GA_DefaultPlayer_InteractUse_C"));
+    
+    static auto GA_TrapBuildGeneric = FindObject(("/Game/Abilities/Traps/Generic/GA_TrapBuildGeneric.GA_TrapBuildGeneric_C"));
+
+    static auto FortGameplayAbility_Sprint = FindObject(("/Script/FortniteGame.FortGameplayAbility_Sprint"));
+    static auto FortGameplayAbility_Jump = FindObject(("/Script/FortniteGame.FortGameplayAbility_Jump"));
+    static auto FortGameplayAbility_RangedWeapon = FindObject(("/Script/FortniteGame.FortGameplayAbility_RangedWeapon"));
+
+    Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_InteractSearch);
+    Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_InteractUse);
+
+    Abilities::GrantGameplayAbility(Pawn, GA_TrapBuildGeneric);
+    
+    Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_Sprint);
+    Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_Jump);
+    Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_RangedWeapon);
 }

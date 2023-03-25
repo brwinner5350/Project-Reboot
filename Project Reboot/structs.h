@@ -415,6 +415,17 @@ int FindOffsetStruct2(const std::string& StructName, const std::string& MemberNa
 void* FindPropStruct2(const std::string& StructName, const std::string& MemberName, bool bPrint = false, bool bContain = false, bool bWarnIfNotFound = true);
 UObject* LoadObject(UObject* Class, const std::string& Name);
 
+template <typename ReturnType = UObject>
+static ReturnType* GetByIndex(int Index)
+{
+	return (ReturnType*)(NewObjects ? NewObjects->GetObjectById(Index) : OldObjects->GetObjectById(Index));
+}
+
+inline auto GetSerialNumber(UObject* Object)
+{
+	return (NewObjects ? NewObjects->GetItemById(Object->InternalIndex) : OldObjects->GetItemById(Object->InternalIndex))->SerialNumber;
+}
+
 int GetEnumValue(UObject* Enum, const std::string& EnumMemberName);
 
 template<typename ElementType>

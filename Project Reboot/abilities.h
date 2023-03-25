@@ -27,3 +27,5 @@ UObject** GetAbilityFromSpec(void* Spec);
 __int64* FindAbilitySpecFromHandle(UObject* ASC, FGameplayAbilitySpecHandle Handle);
 void InternalServerTryActivateAbility(UObject* ASC, FGameplayAbilitySpecHandle Handle, bool InputPressed, void* PredictionKey, __int64* TriggerEventData);
 void GiveFortAbilitySet(UObject* Pawn, UObject* FortAbilitySet);
+
+void GiveBasicGameplayAbilities(UObject* Pawn);

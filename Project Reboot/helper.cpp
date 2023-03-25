@@ -2,6 +2,7 @@
 #include "inventory.h"
 #include <format>
 #include "server.h"
+#include "abilities.h"
 
 UObject* Helper::Easy::SpawnActor(UObject* Class, FVector Location, FRotator Rotation, UObject* Owner)
 {
