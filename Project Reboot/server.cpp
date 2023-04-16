@@ -6,6 +6,7 @@
 #include <intrin.h>
 #include "team.h"
 #include "replication.h"
+#include "helper.h"
 
 void Server::PauseBeaconRequests(bool bPause)
 {
@@ -1099,6 +1100,20 @@ void Server::Hooks::TickFlush(UObject* thisNetDriver, float DeltaSeconds)
 					std::cout << "Finished spawning floor loot!\n";
 				}
 			}
+		}
+	}
+
+	// Handle Controllers & their Pawns in the RespawnQueue
+	for (std::map<UObject*, UObject*>::iterator it = Defines::RespawnQueue.begin(); it != Defines::RespawnQueue.end(); it++)
+	{
+		auto Controller = it->first;
+
+		if (Helper::GetRespawnTimeRemaining(Controller) <= 0.0f)
+		{
+			auto Pawn = it->second;
+
+			Helper::RespawnPawn(Pawn, Controller);
+			Defines::RespawnQueue.erase(it);
 		}
 	}
 

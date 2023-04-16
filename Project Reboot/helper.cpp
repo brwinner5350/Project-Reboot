@@ -93,6 +93,57 @@ UObject* Helper::Easy::SpawnObject(UObject* Class, UObject* Outer)
 	return params.ReturnValue;
 }
 
+void Helper::RespawnPawn(UObject* DeadPawn, UObject* DeadController)
+{
+	std::cout << "DeadController: " << std::hex << DeadController << std::endl;
+	std::cout << "DeadPawn: " << std::hex << DeadPawn << std::endl;
+	auto DeathLocation = Helper::GetActorLocation(DeadPawn);
+
+	DeathLocation.Describe();
+
+	if (DeadPawn)
+		Helper::DestroyActor(DeadPawn);
+
+	auto RespawnedPawn = Helper::SpawnPawn(DeadController, DeathLocation);
+
+	static auto ActivateSlot = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ActivateSlot");
+	struct {
+		EFortQuickBars InQuickBar;
+		int Slot;
+		float ActivateDelay;
+		bool bUpdatePreviousFocusedSlot;
+	} ActivateSlot_Params{EFortQuickBars::Primary, 0, 0, true};
+	DeadController->ProcessEvent(ActivateSlot, &ActivateSlot_Params);
+
+	GiveBasicGameplayAbilities(RespawnedPawn);
+
+	static auto TeleportToSkyDive = FindObject<UFunction>("/Script/FortniteGame.FortPlayerPawnAthena.TeleportToSkyDive");
+	float HeightAboveGround = 15000;
+
+	if (TeleportToSkyDive)
+		RespawnedPawn->ProcessEvent(TeleportToSkyDive, &HeightAboveGround);
+}
+
+float Helper::GetRespawnTimeRemaining(UObject* Controller)
+{
+	static auto GetTimeRemainingForRespawnBP = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController:GetTimeRemainingForRespawnBP");
+
+	struct
+	{
+		float                                    ReturnValue;
+	} GetTimeRemainingForRespawnBP_Params{};
+
+	Controller->ProcessEvent(GetTimeRemainingForRespawnBP, &GetTimeRemainingForRespawnBP_Params);
+
+	return GetTimeRemainingForRespawnBP_Params.ReturnValue;
+}
+
+void Helper::QueuePawnForRespawn(UObject* Pawn, UObject* Controller)
+{
+	// Add the Controller & Pawn to the respawn queue
+	Defines::RespawnQueue.insert({Controller, Pawn});
+}
+
 float Helper::GetTimeSeconds()
 {
 	static auto GSCClass = FindObject(("/Script/Engine.Default__GameplayStatics"));
@@ -399,6 +450,24 @@ UObject* Helper::SpawnPawn(UObject* Controller, BothVector Location, bool bAssig
 		}
 	}
 
+	if (Fortnite_Version < 6.00)
+	{
+		GiveBasicGameplayAbilities(Pawn);
+	}
+	else
+	{
+		if (Fortnite_Version >= 6.00 && Fortnite_Version < 8.30)
+		{
+			static auto AbilitySet = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer"));
+			GiveFortAbilitySet(Pawn, AbilitySet);
+		}
+		else
+		{
+			static auto AbilitySet = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer"));
+			GiveFortAbilitySet(Pawn, AbilitySet);
+		}
+	}
+
 	return Pawn;
 }
 
@@ -418,7 +487,7 @@ void Helper::ChoosePart(UObject* Pawn, TEnumAsByte<EFortCustomPartType> Part, UO
 			unsigned char                                      UnknownData01[0x7];                                       // 0x0071(0x0007) MISSED OFFSET
 		};
 
-		auto PlayerState = Helper::GetPlayerStateFromController(Helper::GetControllerFromPawn(Pawn));
+		auto PlayerState = Helper::GetPlayerStateFromController(Helper::GetControllerFromPawn(Controller));
 
 		if (PlayerState)
 		{

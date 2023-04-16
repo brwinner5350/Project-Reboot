@@ -268,14 +268,14 @@ bool ServerReadyToStartMatch(UObject* PlayerController, UFunction* Function, voi
 	if (!Pawn)
 		return false;
 
+	static auto CheatManagerOffset = PlayerController->GetOffset("CheatManager");
+	auto CheatManager = (UObject**)(__int64(PlayerController) + CheatManagerOffset);
+
+	static auto CheatManagerClass = FindObject("/Script/FortniteGame.FortCheatManager");
+	*CheatManager = Helper::Easy::SpawnObject(CheatManagerClass, PlayerController);
+
 	if (Defines::bIsGoingToPlayMainEvent)
 	{
-		static auto CheatManagerOffset = PlayerController->GetOffset("CheatManager");
-		auto CheatManager = (UObject**)(__int64(PlayerController) + CheatManagerOffset);
-
-		static auto CheatManagerClass = FindObject("/Script/Engine.CheatManager");
-		*CheatManager = Helper::Easy::SpawnObject(CheatManagerClass, PlayerController);
-
 		static auto God = FindObject<UFunction>("/Script/Engine.CheatManager.God");
 		(*CheatManager)->ProcessEvent(God);
 	}
@@ -286,18 +286,6 @@ bool ServerReadyToStartMatch(UObject* PlayerController, UFunction* Function, voi
 
 	if (PlayerController->IsA(FortPlayerControllerZoneClass))
 	{
-		if (Fortnite_Version < 8.30)
-		{
-			static auto AbilitySet = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_DefaultPlayer.GAS_DefaultPlayer"));
-			// GiveFortAbilitySet(Pawn, AbilitySet);
-			GiveBasicGameplayAbilities(Pawn);
-		}
-		else
-		{
-			static auto AbilitySet = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GAS_AthenaPlayer.GAS_AthenaPlayer"));
-			GiveFortAbilitySet(Pawn, AbilitySet);
-		}
-
 		if (!IsBadReadPtr(CurrentPlaylist) && !IsBadReadPtr(*CurrentPlaylist))
 		{
 			static auto LTMModifiersOffset = (*CurrentPlaylist)->GetOffset("ModifierList", false, false, false);
@@ -704,8 +692,6 @@ bool ClientOnPawnDied(UObject* DeadController, UFunction* fn, void* Parameters)
 
 	ProcessEventO(DeadController, fn, Parameters);
 
-	std::cout << "Mf!\n";
-
 	auto GameMode = Helper::GetGameMode();
 	auto DeathReport = (__int64*)Parameters;
 
@@ -764,8 +750,6 @@ bool ClientOnPawnDied(UObject* DeadController, UFunction* fn, void* Parameters)
 				*(float*)(__int64(DeathInfo) + preoffsets::Distance) = *(float*)(__int64(DeadPawn) + LastFallDistanceOffset);
 		}
 	}
-
-	std::cout << "aa!\n";
 
 	auto PlayersLeftPtr = Helper::GetPlayersLeft();
 
@@ -1181,27 +1165,25 @@ bool ClientOnPawnDied(UObject* DeadController, UFunction* fn, void* Parameters)
 	{
 		// if (Fortnite_Version > 11.30)
 		{
-			if (DeadPawn)
-				Helper::DestroyActor(DeadPawn);
+			// Death animation & victory drone
+			static auto BP_VictoryDrone_C = FindObject("/Game/Blueprints/Adventures/SpawnTeleporter/BP_VictoryDrone.BP_VictoryDrone_C");
+			static auto PlayerDeath_Athena = FindObject("/Game/Animation/Game/MainPlayer/Reacts/Deaths/PlayerDeath_Athena.PlayerDeath_Athena");
 
-			auto RespawnedPawn = Helper::SpawnPawn(DeadController, DeathLocation);
-			
-			static auto ActivateSlot = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController.ActivateSlot");
-			struct {
-				EFortQuickBars InQuickBar;
-				int Slot;
-				float ActivateDelay;
-				bool bUpdatePreviousFocusedSlot;
-			} ActivateSlot_Params{EFortQuickBars::Primary, 0, 0, true};
-			DeadController->ProcessEvent(ActivateSlot, &ActivateSlot_Params);
+			static auto PlayAnimMontage = FindObject<UFunction>("/Script/Engine.Character:PlayAnimMontage");
 
-			GiveBasicGameplayAbilities(RespawnedPawn);
+			Helper::Easy::SpawnActor(BP_VictoryDrone_C, Helper::GetActorLocation(DeadPawn));
 
-			static auto TeleportToSkyDive = FindObject<UFunction>("/Script/FortniteGame.FortPlayerPawnAthena.TeleportToSkyDive");
-			float HeightAboveGround = 15000;
+			struct
+			{
+				UObject* AnimMontage;
+				float                                    InPlayRate;
+				FName                                    StartSectionName;
+				float                                    ReturnValue;
+			} PlayAnimMontage_Params{PlayerDeath_Athena, 1.0f, FName()};
 
-			if (TeleportToSkyDive)
-				RespawnedPawn->ProcessEvent(TeleportToSkyDive, &HeightAboveGround);
+			DeadPawn->ProcessEvent(PlayAnimMontage, &PlayAnimMontage_Params);
+
+			Helper::QueuePawnForRespawn(DeadPawn, DeadController);
 		}
 	}
 
@@ -1302,8 +1284,6 @@ bool ServerAttemptAircraftJump(UObject* Controller, UFunction*, void* Parameters
 		if (Pawn)
 			Helper::SetShield(Pawn, 100);
 
-		std::cout << "A!\n";
-
 		static UObject* AthenaAmmoDataRockets = FindObject(("/Game/Athena/Items/Ammo/AmmoDataRockets.AmmoDataRockets"));
 		static UObject* AthenaAmmoDataShells = FindObject(("/Game/Athena/Items/Ammo/AthenaAmmoDataShells.AthenaAmmoDataShells"));
 		static UObject* AthenaAmmoDataBulletsMedium = FindObject(("/Game/Athena/Items/Ammo/AthenaAmmoDataBulletsMedium.AthenaAmmoDataBulletsMedium"));
@@ -1387,8 +1367,6 @@ bool ServerAttemptAircraftJump(UObject* Controller, UFunction*, void* Parameters
 
 					Inventory::GiveItem(Controller, Sniper.Definition, EFortQuickBars::Primary, 3, 1, true, Helper::GetMaxBullets(Sniper.Definition));
 				}
-
-				std::cout << "E!\n";
 
 				slotForFirstConsumable = 4;
 				slotForSecondConsumable = 5;

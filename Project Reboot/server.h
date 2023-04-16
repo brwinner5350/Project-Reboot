@@ -1,6 +1,5 @@
 #pragma once
 
-#include "helper.h"
 #include "definitions.h"
 
 namespace Server

@@ -453,21 +453,47 @@ void GiveFortAbilitySet(UObject* Pawn, UObject* FortAbilitySet)
 
 void GiveBasicGameplayAbilities(UObject* Pawn)
 {
+    // DefaultPlayer abilities
     static auto GA_DefaultPlayer_InteractSearch = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_InteractSearch.GA_DefaultPlayer_InteractSearch_C"));
     static auto GA_DefaultPlayer_InteractUse = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_InteractUse.GA_DefaultPlayer_InteractUse_C"));
-    
+    static auto GA_DefaultPlayer_Death = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_Death.GA_DefaultPlayer_Death_C"));
+    static auto GA_DefaultPlayer_BuildingRepaired = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_BuildingRepaired.GA_DefaultPlayer_BuildingRepaired_C"));
+
+    // slurp
+    static auto GA_Athena_Slurp = FindObject(("/Game/Athena/Items/Consumables/PurpleStuff/GA_Athena_Slurp.GA_Athena_Slurp_C"));
+
+    // traps
     static auto GA_TrapBuildGeneric = FindObject(("/Game/Abilities/Traps/Generic/GA_TrapBuildGeneric.GA_TrapBuildGeneric_C"));
 
+    // vehicles
+    /* static auto GA_AthenaEnterVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaEnterVehicle_C"));
+    static auto GA_AthenaExitVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaExitVehicle_C"));
+    static auto GA_AthenaInVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaInVehicle.GA_AthenaInVehicle_C")); */
+
+    // native abilities (defined in C++)
     static auto FortGameplayAbility_Sprint = FindObject(("/Script/FortniteGame.FortGameplayAbility_Sprint"));
     static auto FortGameplayAbility_Jump = FindObject(("/Script/FortniteGame.FortGameplayAbility_Jump"));
     static auto FortGameplayAbility_RangedWeapon = FindObject(("/Script/FortniteGame.FortGameplayAbility_RangedWeapon"));
 
     Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_InteractSearch);
     Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_InteractUse);
+    Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_Death);
+    Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_BuildingRepaired);
+
+    Abilities::GrantGameplayAbility(Pawn, GA_Athena_Slurp);
 
     Abilities::GrantGameplayAbility(Pawn, GA_TrapBuildGeneric);
-    
+
+    /* Abilities::GrantGameplayAbility(Pawn, GA_AthenaEnterVehicle);
+    Abilities::GrantGameplayAbility(Pawn, GA_AthenaExitVehicle);
+    Abilities::GrantGameplayAbility(Pawn, GA_AthenaInVehicle); */
+
     Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_Sprint);
     Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_Jump);
     Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_RangedWeapon);
+
+    //////// GAMEPLAY EFFECTS ////////
+
+    static auto GE_TrapArmGeneric = FindObject(("/Game/Abilities/Traps/Generic/GE_TrapArmGeneric.GE_TrapArmGeneric"));
+    Helper::ApplyGameplayEffect(Pawn, GE_TrapArmGeneric, 0.0f);
 }
