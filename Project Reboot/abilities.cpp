@@ -466,9 +466,9 @@ void GiveBasicGameplayAbilities(UObject* Pawn)
     static auto GA_TrapBuildGeneric = FindObject(("/Game/Abilities/Traps/Generic/GA_TrapBuildGeneric.GA_TrapBuildGeneric_C"));
 
     // vehicles
-    /* static auto GA_AthenaEnterVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaEnterVehicle_C"));
-    static auto GA_AthenaExitVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaExitVehicle_C"));
-    static auto GA_AthenaInVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaInVehicle.GA_AthenaInVehicle_C")); */
+    static auto GA_AthenaEnterVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaEnterVehicle_C"));
+    static auto GA_AthenaExitVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaExitVehicle.GA_AthenaExitVehicle_C"));
+    static auto GA_AthenaInVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaInVehicle.GA_AthenaInVehicle_C"));
 
     // native abilities (defined in C++)
     static auto FortGameplayAbility_Sprint = FindObject(("/Script/FortniteGame.FortGameplayAbility_Sprint"));
@@ -484,9 +484,9 @@ void GiveBasicGameplayAbilities(UObject* Pawn)
 
     Abilities::GrantGameplayAbility(Pawn, GA_TrapBuildGeneric);
 
-    /* Abilities::GrantGameplayAbility(Pawn, GA_AthenaEnterVehicle);
+    Abilities::GrantGameplayAbility(Pawn, GA_AthenaEnterVehicle);
     Abilities::GrantGameplayAbility(Pawn, GA_AthenaExitVehicle);
-    Abilities::GrantGameplayAbility(Pawn, GA_AthenaInVehicle); */
+    Abilities::GrantGameplayAbility(Pawn, GA_AthenaInVehicle);
 
     Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_Sprint);
     Abilities::GrantGameplayAbility(Pawn, FortGameplayAbility_Jump);
