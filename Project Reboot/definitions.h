@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 #include "structs.h"
 #include "log.h"
 
@@ -19,7 +21,7 @@ namespace Defines
 {
 	inline bool bLogProcessEvent = false;
 	inline bool bReadyForStartMatch = true;
-	inline bool bIsPlayground = false;
+	inline bool bIsPlayground = true;
 	inline bool bIsLateGame = false;
 	inline bool bIsCreative = false;
 	inline bool bIsGoingToPlayMainEvent = false;
@@ -34,6 +36,11 @@ namespace Defines
 	inline bool bShouldRestart = false;
 
 	inline int SecondsUntilTravel = 5;
+
+	/* Map of Controllers & their respective Pawns waiting to be respawned.
+	 * Controller is the first key, Pawn is the second key.
+	 */
+	inline std::map<UObject*, UObject*> RespawnQueue;
 
 	inline std::string MapName;
 

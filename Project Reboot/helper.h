@@ -19,6 +19,11 @@ namespace Helper
 	static UObject* GetBGAClass() { static auto BGAClass = FindObject("/Script/Engine.BlueprintGeneratedClass"); return BGAClass; }
 	static void DestroyActor(UObject* Actor) { static auto fn = FindObject<UFunction>("/Script/Engine.Actor.K2_DestroyActor"); Actor->ProcessEvent(fn); }
 
+	void RespawnPawn(UObject* DeadPawn, UObject* DeadController);
+	void QueuePawnForRespawn(UObject* Pawn, UObject* Controller);
+
+	float GetRespawnTimeRemaining(UObject* Controller);
+
 	float GetTimeSeconds();
 	bool IsPlayerController(UObject* Object);
 	void ExecuteConsoleCommand(FString Command);
