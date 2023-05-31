@@ -459,15 +459,16 @@ void GiveBasicGameplayAbilities(UObject* Pawn)
     static auto GA_DefaultPlayer_Death = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_Death.GA_DefaultPlayer_Death_C"));
     static auto GA_DefaultPlayer_BuildingRepaired = FindObject(("/Game/Abilities/Player/Generic/Traits/DefaultPlayer/GA_DefaultPlayer_BuildingRepaired.GA_DefaultPlayer_BuildingRepaired_C"));
 
-    // slurp
-    static auto GA_Athena_Slurp = FindObject(("/Game/Athena/Items/Consumables/PurpleStuff/GA_Athena_Slurp.GA_Athena_Slurp_C"));
-
-    // traps
-    static auto GA_TrapBuildGeneric = FindObject(("/Game/Abilities/Traps/Generic/GA_TrapBuildGeneric.GA_TrapBuildGeneric_C"));
+    // slurp (not found in 4.1 game files)
+    if (Fortnite_Version >= 5.00)
+    {
+        static auto GA_Athena_Slurp = FindObject(("/Game/Athena/Items/Consumables/PurpleStuff/GA_Athena_Slurp.GA_Athena_Slurp_C"));
+        Abilities::GrantGameplayAbility(Pawn, GA_Athena_Slurp);
+    }
 
     // vehicles
     /* static auto GA_AthenaEnterVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaEnterVehicle_C"));
-    static auto GA_AthenaExitVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaEnterVehicle.GA_AthenaExitVehicle_C"));
+    static auto GA_AthenaExitVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaExitVehicle.GA_AthenaExitVehicle_C"));
     static auto GA_AthenaInVehicle = FindObject(("/Game/Athena/DrivableVehicles/GA_AthenaInVehicle.GA_AthenaInVehicle_C")); */
 
     // native abilities (defined in C++)
@@ -479,10 +480,6 @@ void GiveBasicGameplayAbilities(UObject* Pawn)
     Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_InteractUse);
     Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_Death);
     Abilities::GrantGameplayAbility(Pawn, GA_DefaultPlayer_BuildingRepaired);
-
-    Abilities::GrantGameplayAbility(Pawn, GA_Athena_Slurp);
-
-    Abilities::GrantGameplayAbility(Pawn, GA_TrapBuildGeneric);
 
     /* Abilities::GrantGameplayAbility(Pawn, GA_AthenaEnterVehicle);
     Abilities::GrantGameplayAbility(Pawn, GA_AthenaExitVehicle);

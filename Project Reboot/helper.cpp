@@ -126,7 +126,17 @@ void Helper::RespawnPawn(UObject* DeadPawn, UObject* DeadController)
 
 float Helper::GetRespawnTimeRemaining(UObject* Controller)
 {
-	static auto GetTimeRemainingForRespawnBP = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController:GetTimeRemainingForRespawnBP");
+	static auto GetPlayerRespawnDelay = FindObject<UFunction>("/Script/Engine.GameStateBase:GetPlayerRespawnDelay");
+
+	struct
+	{
+		UObject* Controller;
+		float                                    ReturnValue;
+	} GetPlayerRespawnDelay_Params{Controller};
+
+	GetGameState()->ProcessEvent(GetPlayerRespawnDelay, &GetPlayerRespawnDelay_Params);
+
+	/* static auto GetTimeRemainingForRespawnBP = FindObject<UFunction>("/Script/FortniteGame.FortPlayerController:GetTimeRemainingForRespawnBP");
 
 	struct
 	{
@@ -135,7 +145,7 @@ float Helper::GetRespawnTimeRemaining(UObject* Controller)
 
 	Controller->ProcessEvent(GetTimeRemainingForRespawnBP, &GetTimeRemainingForRespawnBP_Params);
 
-	return GetTimeRemainingForRespawnBP_Params.ReturnValue;
+	return GetTimeRemainingForRespawnBP_Params.ReturnValue; */
 }
 
 void Helper::QueuePawnForRespawn(UObject* Pawn, UObject* Controller)
